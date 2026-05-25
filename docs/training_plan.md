@@ -9,7 +9,7 @@ This document describes the Phase 2 training path.
 ```python
 {
     "features": FloatTensor[C, Ht, Wt],
-    "labels": LongTensor[Ht, Wt],
+    "labels": LongTensor[Wt, Ht],
     "metadata": dict,
 }
 ```
@@ -17,8 +17,8 @@ This document describes the Phase 2 training path.
 Where:
 
 ```text
-Ht = H / tile_size
-Wt = W / tile_size
+Ht = ceil(H / tile_size)
+Wt = ceil(W / tile_size)
 ```
 
 ## Preprocessing
@@ -39,6 +39,7 @@ Initial model:
 - Input channels: `7` once final packing is confirmed.
 - Output channels: `6`.
 - Output resolution: tile-space.
+- Phase 1 label exports use `[Wt, Ht] = [120, 68]`; training code may transpose to framework-preferred `[Ht, Wt]` if documented at the dataset boundary.
 - Activation: raw logits for training, softmax only for inference/debugging.
 
 ## Loss
@@ -90,4 +91,3 @@ PyTorch .pt -> ONNX -> TensorRT .engine
 ```
 
 Export validation should compare PyTorch and ONNX/TensorRT logits on a fixed batch before accepting the artifact.
-

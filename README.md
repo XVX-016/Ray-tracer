@@ -85,6 +85,14 @@ outputs/
   exports/
 ```
 
+## Implemented Phase 1 Modules
+
+The initial Phase 1 implementation lives in `src/data/`:
+
+- `scene_config.py`: Mitsuba 3 dual-pass renderer and G-buffer packer.
+- `tile_labeller.py`: perceptual error map generation and 16x16 tile labelling.
+- `exporter.py`: HDF5 sequence writer and lightweight reader.
+
 ## Open Project Decisions
 
 The main unresolved design choice is tile size:
@@ -92,5 +100,4 @@ The main unresolved design choice is tile size:
 - **8x8 tiles**: higher spatial granularity, more scheduling overhead, potentially better quality allocation.
 - **16x16 tiles**: safer renderer scheduling, lower overhead, coarser allocation.
 
-Until this is confirmed, documentation uses **16x16 tile-space** as the default because it matches the stated model tensor shape `[B, C, H/16, W/16]`.
-
+Documentation and code now use **16x16 tile-space** as the Phase 1 default. The exported label grid is `[120, 68]`, using horizontal tile index first and vertical tile index second.

@@ -19,8 +19,8 @@ Recommended file layout:
 /features/temporal_luminance_var     float16  [H, W, 1]
 
 /reference/rgb                       float16  [H, W, 3]
-/labels/tile_class                   uint8    [H / T, W / T]
-/labels/tile_budget                  uint8    [H / T, W / T]
+/labels/tile_class                   uint8    [ceil(W / T), ceil(H / T)]
+/labels/tile_budget                  uint8    [ceil(W / T), ceil(H / T)]
 
 /metadata/frame_id                   string or int
 /metadata/scene_id                   string
@@ -29,7 +29,7 @@ Recommended file layout:
 /metadata/budget_classes             uint8    [6]
 ```
 
-Where `T` is the chosen tile size.
+Where `T` is the chosen tile size. At 1920x1080 with `T = 16`, the structural grid is `[120, 68]`, stored as `[tile_x, tile_y]`.
 
 ## Feature Channels
 
@@ -54,7 +54,7 @@ PyTorch tensors should use channel-first format:
 [B, C, H / T, W / T]
 ```
 
-The dataset is responsible for converting full-resolution feature buffers into tile-space tensors.
+The dataset is responsible for converting full-resolution feature buffers into tile-space tensors. Phase 1 label tensors are stored as `[tile_x, tile_y] = [120, 68]`; Phase 2 may transpose labels to row-major model layout at the dataset boundary.
 
 ## Labels
 
@@ -76,9 +76,8 @@ The class-to-budget mapping is:
 Every exported frame should pass these checks:
 
 - Feature, reference, and label dimensions are mutually aligned.
-- `H` and `W` are divisible by `tile_size`.
+- Label dimensions match `ceil(W / tile_size)` by `ceil(H / tile_size)`.
 - No NaN or Inf values in floating point datasets.
 - Normal vectors are either zero for invalid pixels or approximately unit length.
 - Label classes are in `[0, 5]`.
 - Metadata contains enough information to reproduce the frame.
-

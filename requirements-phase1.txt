@@ -1,0 +1,5 @@
+numpy>=1.24
+torch>=2.1
+h5py>=3.10
+mitsuba>=3.5
+

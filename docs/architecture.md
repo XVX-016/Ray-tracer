@@ -44,10 +44,11 @@ The labeller compares low-budget candidate renders against the reference image, 
 The intended output is a tile grid:
 
 ```text
-[H / tile_size, W / tile_size]
+[ceil(W / tile_size), ceil(H / tile_size)]
 ```
 
 Each tile stores a class index corresponding to `{0, 1, 2, 4, 8, 16}`.
+For the Phase 1 exporter, 1920x1080 with 16x16 tiles is stored as `[120, 68]`, with horizontal tile coordinate first.
 
 ## Phase 2: ML Training
 
@@ -57,7 +58,7 @@ The dataset consumes exported `.hdf5` or `.npy` dumps and produces:
 
 ```text
 inputs:  [B, C, H / tile_size, W / tile_size]
-labels:  [B, H / tile_size, W / tile_size]
+labels:  [B, ceil(W / tile_size), ceil(H / tile_size)]
 ```
 
 The initial expected input channel count is `7`, subject to final G-buffer packing.
@@ -102,4 +103,3 @@ At runtime, the renderer should:
 4. Convert class logits into ray budget counts.
 5. Schedule ray work per tile.
 6. Apply temporal/spatial stabilization if the budget map flickers.
-

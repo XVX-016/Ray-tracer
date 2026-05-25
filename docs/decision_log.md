@@ -32,7 +32,7 @@ Use high-sample ground truth renders for labelling:
 
 ### Tile Size
 
-Default documented assumption:
+Confirmed Phase 1 assumption:
 
 ```text
 T = 16
@@ -42,6 +42,16 @@ Options:
 
 - `8x8`: more granular, potentially better quality, higher scheduling pressure.
 - `16x16`: coarser, safer for renderer scheduling, lower overhead.
+
+### Tile Grid Layout
+
+Phase 1 stores tile labels as:
+
+```text
+[tile_x, tile_y] = [120, 68]
+```
+
+Training code may transpose this to row-major `[68, 120]` at the PyTorch dataset boundary if needed, but the HDF5 contract remains `[120, 68]`.
 
 ### Feature Channel Count
 
@@ -67,4 +77,3 @@ Until explicitly changed:
 - Model: compact U-Net baseline.
 - First training loss: weighted cross entropy plus render-cost regularization.
 - Deployment path: PyTorch -> ONNX -> TensorRT FP16.
-
